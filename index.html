@@ -1,0 +1,2173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecteur Saint Louis ✨</title>
+    <style>
+        :root {
+            --primary: #ffffff;
+            --secondary: #3964fe;
+            --accent: #ff6b8b;
+            --text: #1a1a1a;
+            --text-light: #666666;
+            --border: #e0e0e0;
+            --card-bg: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
+            --radius: 20px;
+            --header-height: 90px;
+        }
+
+        /* Reset et base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            padding-top: var(--header-height);
+        }
+
+        /* Particules animées en fond */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            background: linear-gradient(135deg, var(--secondary), rgba(255, 107, 139, 0.3));
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+            opacity: 0.3;
+        }
+
+        @keyframes float {
+            0%, 100% { 
+                transform: translate(0, 0) rotate(0deg) scale(1); 
+                opacity: 0.2;
+            }
+            25% { 
+                transform: translate(calc(100vw * 0.1), calc(100vh * 0.05)) rotate(90deg) scale(1.1); 
+                opacity: 0.3;
+            }
+            50% { 
+                transform: translate(calc(100vw * 0.05), calc(100vh * 0.1)) rotate(180deg) scale(0.9);
+                opacity: 0.4;
+            }
+            75% { 
+                transform: translate(calc(-100vw * 0.05), calc(100vh * 0.05)) rotate(270deg) scale(1.05);
+                opacity: 0.25;
+            }
+        }
+
+        /* Header élégant avec animation */
+        header {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(224, 224, 224, 0.3);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            animation: slideDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: top;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%) scaleY(0);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scaleY(1);
+                opacity: 1;
+            }
+        }
+
+        .header-content {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeIn 1s ease-out 0.3s both;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--secondary);
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            padding: 10px 0;
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+            transform: translateX(-100%);
+            animation: slideIn 0.8s ease-out 0.5s forwards;
+        }
+
+        @keyframes slideIn {
+            to { transform: translateX(0); }
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--secondary), #2950ff);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 10px 25px rgba(57, 100, 254, 0.3);
+            animation: pulseGlow 2s infinite alternate, rotateIn 0.6s ease-out;
+        }
+
+        @keyframes pulseGlow {
+            0% { 
+                transform: scale(1);
+                box-shadow: 0 10px 25px rgba(57, 100, 254, 0.3);
+            }
+            100% { 
+                transform: scale(1.05);
+                box-shadow: 0 15px 35px rgba(57, 100, 254, 0.4);
+            }
+        }
+
+        @keyframes rotateIn {
+            from { 
+                transform: rotate(-180deg) scale(0);
+                opacity: 0;
+            }
+            to { 
+                transform: rotate(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Conteneur principal centré */
+        .main-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 40px;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Barre de recherche élégante */
+        .search-section {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+            animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s both;
+        }
+
+        @keyframes scaleIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .search-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+            animation: widthGrow 1s ease-out 0.8s both;
+        }
+
+        @keyframes widthGrow {
+            from { width: 0%; left: 50%; }
+            to { width: 100%; left: 0; }
+        }
+
+        .search-container {
+            display: flex;
+            gap: 20px;
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary);
+            font-size: 22px;
+            z-index: 1;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.1); }
+        }
+
+        #searchInput {
+            flex: 1;
+            padding: 22px 25px 22px 60px;
+            border: 2px solid rgba(57, 100, 254, 0.2);
+            border-radius: 15px;
+            font-size: 18px;
+            color: var(--text);
+            background: var(--primary);
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+        }
+
+        #searchInput:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 4px rgba(57, 100, 254, 0.15);
+            transform: translateY(-3px);
+            animation: inputFocus 0.4s ease-out;
+        }
+
+        @keyframes inputFocus {
+            0% { transform: translateY(-3px) scale(1); }
+            50% { transform: translateY(-3px) scale(1.02); }
+            100% { transform: translateY(-3px) scale(1); }
+        }
+
+        #searchBtn {
+            padding: 22px 45px;
+            background: linear-gradient(135deg, var(--secondary), #2950ff);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #searchBtn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            100% { left: 100%; }
+        }
+
+        #searchBtn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(57, 100, 254, 0.4);
+        }
+
+        /* Section tendances */
+        .trending-section {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 40px;
+            animation: slideInLeft 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s both;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .section-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 35px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+            border-radius: 2px;
+        }
+
+        #trendingVideos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 35px;
+        }
+
+        /* Section lecteur */
+        .player-section {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 40px;
+            animation: slideInRight 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.7s both;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .video-player-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.9s both;
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) rotate(-5deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0);
+            }
+        }
+
+        #videoPlayer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .player-controls {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        #videoUrlInput {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px 25px;
+            border: 2px solid rgba(57, 100, 254, 0.2);
+            border-radius: 15px;
+            font-size: 17px;
+            color: var(--text);
+            background: var(--primary);
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #videoUrlInput:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 4px rgba(57, 100, 254, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .player-buttons {
+            display: flex;
+            gap: 20px;
+        }
+
+        #playUrlBtn, #copyLinkBtn {
+            padding: 20px 35px;
+            border: none;
+            border-radius: 15px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #playUrlBtn {
+            background: linear-gradient(135deg, var(--secondary), #2950ff);
+            color: white;
+        }
+
+        #copyLinkBtn {
+            background: linear-gradient(135deg, var(--accent), #ff4d7e);
+            color: white;
+        }
+
+        #playUrlBtn:hover, #copyLinkBtn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(57, 100, 254, 0.3);
+        }
+
+        /* Section résultats - MAINTENANT DIRECTEMENT SOUS LA BARRE DE RECHERCHE */
+        .results-section {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            animation: fadeIn 0.8s ease-out;
+            display: none; /* Caché par défaut */
+            margin-bottom: 40px;
+        }
+
+        .results-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 35px;
+            padding-bottom: 25px;
+            border-bottom: 2px solid rgba(57, 100, 254, 0.1);
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 18px 32px;
+            background: rgba(57, 100, 254, 0.08);
+            border: 2px solid transparent;
+            border-radius: 15px;
+            font-size: 17px;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(57, 100, 254, 0.15), transparent);
+            transition: left 0.6s;
+        }
+
+        .tab-btn:hover::before {
+            left: 100%;
+        }
+
+        .tab-btn:hover {
+            background: rgba(57, 100, 254, 0.15);
+            transform: translateY(-3px);
+            color: var(--secondary);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--secondary), #2950ff);
+            color: white;
+            border-color: var(--secondary);
+            box-shadow: 0 10px 25px rgba(57, 100, 254, 0.25);
+            transform: translateY(-3px);
+        }
+
+        /* Filtres YouTube-like */
+        .filter-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(57, 100, 254, 0.03);
+            border-radius: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 28px;
+            background: rgba(57, 100, 254, 0.1);
+            border: 1px solid rgba(57, 100, 254, 0.2);
+            border-radius: 25px;
+            font-size: 15px;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+        }
+
+        .filter-btn:hover {
+            background: rgba(57, 100, 254, 0.2);
+            transform: translateY(-2px);
+            color: var(--secondary);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--secondary), #2950ff);
+            color: white;
+            border-color: var(--secondary);
+            box-shadow: 0 5px 15px rgba(57, 100, 254, 0.2);
+        }
+
+        /* Cartes vidéos avec animations */
+        #videosResults, #channelsResults {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 35px;
+        }
+
+        .video-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            animation: cardAppear 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+
+        @keyframes cardAppear {
+            0% {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .video-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--secondary);
+        }
+
+        .thumbnail-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            background: linear-gradient(135deg, #f1f5ff, #e8edff);
+            overflow: hidden;
+        }
+
+        .video-thumbnail {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .video-card:hover .video-thumbnail {
+            transform: scale(1.15);
+        }
+
+        .play-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary);
+            font-size: 28px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0;
+        }
+
+        .video-card:hover .play-overlay {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            animation: pulsePlay 1.5s infinite;
+        }
+
+        @keyframes pulsePlay {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(57, 100, 254, 0.4); }
+            50% { box-shadow: 0 0 0 15px rgba(57, 100, 254, 0); }
+        }
+
+        .duration-badge {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.5s ease-out 0.2s both;
+        }
+
+        .video-content {
+            padding: 30px;
+        }
+
+        .video-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 20px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            transition: color 0.3s ease;
+        }
+
+        .video-card:hover .video-title {
+            color: var(--secondary);
+        }
+
+        .video-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            color: var(--text-light);
+        }
+
+        /* Interface chaîne détaillée */
+        .channel-detail-section {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 40px;
+            animation: slideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: none; /* Caché par défaut */
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .channel-header {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid rgba(57, 100, 254, 0.1);
+        }
+
+        .channel-avatar-large {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 6px solid white;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            animation: avatarPop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+        }
+
+        @keyframes avatarPop {
+            0% {
+                transform: scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1) rotate(0);
+                opacity: 1;
+            }
+        }
+
+        .channel-avatar-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .channel-info {
+            flex: 1;
+        }
+
+        .channel-name-large {
+            font-size: 36px;
+            font-weight: 900;
+            color: var(--text);
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .channel-stats-large {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 25px;
+        }
+
+        .stat-item-large {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(57, 100, 254, 0.08);
+            padding: 20px 30px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item-large:hover {
+            background: rgba(57, 100, 254, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .stat-item-large i {
+            font-size: 28px;
+            color: var(--secondary);
+        }
+
+        .stat-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .stat-label {
+            font-size: 15px;
+            color: var(--text-light);
+        }
+
+        .channel-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(57, 100, 254, 0.1);
+        }
+
+        .channel-tab {
+            padding: 20px 40px;
+            background: rgba(57, 100, 254, 0.08);
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .channel-tab::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .channel-tab:hover::before {
+            width: 100%;
+        }
+
+        .channel-tab.active {
+            background: linear-gradient(135deg, var(--secondary), #2950ff);
+            color: white;
+        }
+
+        /* Cartes chaînes */
+        .channel-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 40px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: cardAppear 0.6s ease-out;
+        }
+
+        .channel-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+            transform: translateX(-100%);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .channel-card:hover::before {
+            transform: translateX(0);
+        }
+
+        .channel-card:hover {
+            transform: translateY(-15px) scale(1.03);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .channel-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 25px;
+            overflow: hidden;
+            border: 5px solid white;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .channel-card:hover .channel-avatar {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 25px 50px rgba(57, 100, 254, 0.3);
+        }
+
+        .channel-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .channel-name {
+            font-weight: 800;
+            color: var(--text);
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .channel-description {
+            font-size: 16px;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .channel-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            font-size: 15px;
+            color: var(--text-light);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(57, 100, 254, 0.08);
+            padding: 15px 25px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .channel-card:hover .stat-item {
+            background: rgba(57, 100, 254, 0.15);
+            transform: translateY(-5px);
+        }
+
+        /* Messages et chargement */
+        .message {
+            text-align: center;
+            padding: 80px 40px;
+            color: var(--text-light);
+            font-size: 20px;
+            background: linear-gradient(135deg, #f8faff, #e8edff);
+            border-radius: var(--radius);
+            border: 2px solid rgba(57, 100, 254, 0.1);
+            grid-column: 1 / -1;
+            animation: messagePop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes messagePop {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) rotate(-10deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0);
+            }
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .loader {
+            width: 80px;
+            height: 80px;
+            border: 5px solid rgba(57, 100, 254, 0.1);
+            border-top: 5px solid var(--secondary);
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite, colorChange 3s infinite alternate;
+        }
+
+        @keyframes colorChange {
+            0% { border-top-color: var(--secondary); }
+            50% { border-top-color: var(--accent); }
+            100% { border-top-color: var(--secondary); }
+        }
+
+        /* Bouton "Afficher plus" flottant */
+        .load-more-btn {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            background: linear-gradient(135deg, var(--secondary), #2950ff);
+            color: white;
+            padding: 20px 35px;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 15px 35px rgba(57, 100, 254, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: floatBtn 3s infinite ease-in-out;
+            display: none; /* Caché par défaut */
+        }
+
+        @keyframes floatBtn {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .load-more-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(57, 100, 254, 0.5);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 100px;
+            padding: 50px 40px;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 16px;
+            border-top: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            animation: fadeIn 1s ease-out 1s both;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            background: linear-gradient(135deg, var(--secondary), #2950ff);
+            color: white;
+            padding: 25px 35px;
+            border-radius: 15px;
+            box-shadow: 0 20px 50px rgba(57, 100, 254, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 10000;
+            animation: slideInRight 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), fadeOut 0.5s ease-out 2.5s forwards;
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateY(100px);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-container {
+                padding: 0 30px;
+            }
+            
+            #trendingVideos,
+            #videosResults,
+            #channelsResults {
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --header-height: 80px;
+            }
+            
+            header {
+                padding: 0 25px;
+            }
+            
+            .main-container {
+                padding: 0 25px;
+                margin: 30px auto;
+            }
+            
+            .search-section,
+            .trending-section,
+            .player-section,
+            .results-section,
+            .channel-detail-section {
+                padding: 30px;
+            }
+            
+            .search-container {
+                flex-direction: column;
+            }
+            
+            #searchBtn,
+            #playUrlBtn,
+            #copyLinkBtn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .player-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .channel-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 30px;
+            }
+            
+            .channel-stats-large {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .channel-tabs {
+                flex-direction: column;
+            }
+            
+            .channel-tab {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .load-more-btn {
+                bottom: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 0 20px;
+            }
+            
+            .logo {
+                font-size: 22px;
+            }
+            
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+            
+            .main-container {
+                padding: 0 20px;
+            }
+            
+            .search-section,
+            .trending-section,
+            .player-section,
+            .results-section,
+            .channel-detail-section {
+                padding: 25px;
+            }
+            
+            #searchInput {
+                padding: 20px 25px 20px 55px;
+                font-size: 16px;
+            }
+            
+            .section-title {
+                font-size: 22px;
+            }
+            
+            #trendingVideos,
+            #videosResults,
+            #channelsResults {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+            
+            .filter-buttons {
+                justify-content: center;
+            }
+            
+            .filter-btn {
+                flex: 1;
+                min-width: 120px;
+                text-align: center;
+            }
+            
+            .load-more-btn {
+                bottom: 15px;
+                right: 15px;
+                padding: 12px 20px;
+                font-size: 15px;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Particules animées -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-crown"></i>
+                </div>
+                Lecteur Saint Louis ✨
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenu principal -->
+    <div class="main-container">
+        <!-- Barre de recherche -->
+        <section class="search-section">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Rechercher des vidéos, chaînes...">
+                <button id="searchBtn">
+                    <i class="fas fa-search"></i>
+                    Rechercher
+                </button>
+            </div>
+        </section>
+
+        <!-- Section résultats (APPEARAIT DIRECTEMENT SOUS LA BARRE DE RECHERCHE) -->
+        <section class="results-section" id="resultsSection">
+            <h2 class="section-title">
+                <i class="fas fa-search"></i>
+                Résultats de recherche
+            </h2>
+            
+            <div class="results-tabs">
+                <button class="tab-btn active" data-tab="videos">
+                    <i class="fas fa-video"></i>
+                    Vidéos
+                </button>
+                <button class="tab-btn" data-tab="channels">
+                    <i class="fas fa-tv"></i>
+                    Chaînes
+                </button>
+            </div>
+
+            <!-- Filtres YouTube-like -->
+            <div class="filter-buttons" id="videoFilters" style="display: none;">
+                <button class="filter-btn active" data-filter="relevance">Le plus pertinent</button>
+                <button class="filter-btn" data-filter="date">Le plus récent</button>
+                <button class="filter-btn" data-filter="viewCount">Le plus populaire</button>
+            </div>
+
+            <!-- Section chaîne détaillée (cachée par défaut) -->
+            <div id="channelDetailSection" class="channel-detail-section">
+                <!-- Rempli dynamiquement -->
+            </div>
+
+            <!-- Résultats vidéos -->
+            <div id="videosResults"></div>
+            
+            <!-- Résultats chaînes -->
+            <div id="channelsResults" style="display: none;"></div>
+        </section>
+
+        <!-- Section tendances (CACHÉE QUAND ON RECHERCHE) -->
+        <section class="trending-section" id="trendingSection">
+            <h2 class="section-title">
+                <i class="fas fa-fire"></i>
+                Tendances du moment
+            </h2>
+            <div id="trendingVideos"></div>
+        </section>
+
+        <!-- Section lecteur -->
+        <section class="player-section">
+            <h2 class="section-title">
+                <i class="fas fa-play-circle"></i>
+                Lecteur vidéo
+            </h2>
+            
+            <div class="video-player-container">
+                <iframe id="videoPlayer" frameborder="0" allowfullscreen 
+                    allow="autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+            </div>
+
+            <div class="player-controls">
+                <input type="text" id="videoUrlInput" placeholder="Collez une URL YouTube ici...">
+                <div class="player-buttons">
+                    <button id="playUrlBtn">
+                        <i class="fas fa-play"></i>
+                        Lire la vidéo
+                    </button>
+                    <button id="copyLinkBtn">
+                        <i class="fas fa-copy"></i>
+                        Copier & NoTube
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Bouton "Afficher plus" flottant -->
+    <button class="load-more-btn" id="loadMoreBtn">
+        <i class="fas fa-plus"></i>
+        Afficher plus
+    </button>
+
+    <footer>
+        <div style="font-size: 22px; font-weight: 900; margin-bottom: 20px; color: var(--secondary);">
+            Lecteur Saint Louis ✨
+        </div>
+        <div>Expérience YouTube ultime avec animations WOW</div>
+        <div style="margin-top: 15px; font-size: 15px; opacity: 0.8;">
+            Interface responsive • Animations fluides • Design époustouflant
+        </div>
+    </footer>
+
+    <script>
+        // Configuration
+        const API_KEY = 'AIzaSyAUTPWPbAokXSxCw4XSaYCtcmamIjylTB8';
+        const API_BASE = 'https://www.googleapis.com/youtube/v3';
+        
+        // État de l'application
+        let currentVideoUrl = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+        let currentChannelData = null;
+        let currentFilter = 'relevance';
+        let currentSearchQuery = '';
+        let currentSearchType = 'video';
+        let nextPageTokens = {
+            videos: null,
+            channels: null,
+            channelVideos: null
+        };
+        let isSearching = false;
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            initParticles();
+            loadTrendingVideos();
+            setupEventListeners();
+            playVideo('dQw4w9WgXcQ');
+            searchInput.focus();
+            
+            // Observer pour le bouton "Afficher plus"
+            setupIntersectionObserver();
+            
+            // Animation d'entrée globale
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.8s ease';
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+
+        function initParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = `${Math.random() * 150 + 50}px`;
+                particle.style.height = particle.style.width;
+                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.animationDelay = `${Math.random() * 20}s`;
+                container.appendChild(particle);
+            }
+        }
+
+        function setupEventListeners() {
+            // Recherche
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') performSearch();
+            });
+            searchBtn.addEventListener('click', performSearch);
+
+            // Lecture par URL
+            playUrlBtn.addEventListener('click', playFromUrl);
+            videoUrlInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') playFromUrl();
+            });
+
+            // CORRECTION : Copier et ouvrir NoTube - FONCTIONNEL
+            copyLinkBtn.addEventListener('click', async () => {
+                await copyAndOpenNoTube();
+            });
+
+            // Onglets
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    animateTabSwitch(btn);
+                });
+            });
+
+            // Filtres vidéos
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilter = btn.dataset.filter;
+                    
+                    // Animation du filtre
+                    btn.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        btn.style.transform = 'scale(1)';
+                    }, 150);
+                    
+                    // Recharger avec le nouveau filtre
+                    if (currentSearchQuery && !currentChannelData) {
+                        searchVideos(currentSearchQuery);
+                    }
+                });
+            });
+
+            // Bouton "Afficher plus"
+            loadMoreBtn.addEventListener('click', loadMoreContent);
+        }
+
+        function setupIntersectionObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && 
+                        !isSearching && 
+                        (nextPageTokens.videos || nextPageTokens.channels)) {
+                        loadMoreBtn.style.display = 'flex';
+                    }
+                });
+            }, {
+                threshold: 0.5
+            });
+
+            // Observer la section des résultats
+            const resultsSection = document.getElementById('resultsSection');
+            if (resultsSection) {
+                observer.observe(resultsSection);
+            }
+        }
+
+        function animateTabSwitch(btn) {
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(tab => {
+                tab.style.transform = 'scale(0.95)';
+                tab.style.opacity = '0.5';
+                tab.classList.remove('active');
+            });
+            
+            btn.style.transform = 'scale(1)';
+            btn.style.opacity = '1';
+            btn.classList.add('active');
+            
+            setTimeout(() => {
+                tabs.forEach(tab => {
+                    tab.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                    tab.style.transform = '';
+                    tab.style.opacity = '';
+                });
+            }, 50);
+            
+            const videosDiv = document.getElementById('videosResults');
+            const channelsDiv = document.getElementById('channelsResults');
+            const channelDetail = document.getElementById('channelDetailSection');
+            const filters = document.getElementById('videoFilters');
+            
+            if (btn.dataset.tab === 'videos') {
+                videosDiv.style.display = 'grid';
+                channelsDiv.style.display = 'none';
+                channelDetail.style.display = 'none';
+                filters.style.display = 'flex';
+                currentSearchType = 'video';
+            } else {
+                videosDiv.style.display = 'none';
+                channelsDiv.style.display = 'grid';
+                channelDetail.style.display = 'none';
+                filters.style.display = 'none';
+                currentSearchType = 'channel';
+            }
+        }
+
+        async function loadTrendingVideos() {
+            try {
+                showLoading('trendingVideos', 'Chargement des tendances...');
+                
+                const response = await fetch(
+                    `${API_BASE}/videos?part=snippet,statistics,contentDetails&chart=mostPopular&maxResults=6&regionCode=FR&key=${API_KEY}`
+                );
+                
+                const data = await response.json();
+                
+                if (data.items?.length) {
+                    // Filtrer les shorts (< 1 minute)
+                    const filteredVideos = data.items.filter(video => {
+                        const duration = video.contentDetails?.duration || '';
+                        // Vérifier si c'est un short (durée < 1 minute)
+                        return !isShortVideo(duration);
+                    });
+                    
+                    displayVideos(filteredVideos, 'trendingVideos');
+                } else {
+                    showMessage('trendingVideos', 'Aucune vidéo tendance disponible');
+                }
+            } catch (error) {
+                console.error('Erreur tendances:', error);
+                showMessage('trendingVideos', 'Erreur de chargement');
+            }
+        }
+
+        function isShortVideo(duration) {
+            // Vérifie si la durée est inférieure à 1 minute (60 secondes)
+            const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+            if (!match) return false;
+            
+            const hours = parseInt(match[1]) || 0;
+            const minutes = parseInt(match[2]) || 0;
+            const seconds = parseInt(match[3]) || 0;
+            
+            const totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
+            return totalSeconds < 60; // Moins d'une minute = short
+        }
+
+        async function performSearch() {
+            const query = searchInput.value.trim();
+            if (!query) return;
+
+            isSearching = true;
+            currentSearchQuery = query;
+            nextPageTokens = { videos: null, channels: null, channelVideos: null };
+            
+            // Afficher la section résultats SOUS la barre de recherche
+            document.getElementById('resultsSection').style.display = 'block';
+            document.getElementById('trendingSection').style.display = 'none';
+            
+            // Animation de recherche
+            searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Recherche...';
+            searchBtn.disabled = true;
+            
+            await searchVideos(query);
+            await searchChannels(query);
+            
+            searchBtn.innerHTML = '<i class="fas fa-search"></i> Rechercher';
+            searchBtn.disabled = false;
+            isSearching = false;
+            
+            document.querySelector('[data-tab="videos"]').click();
+            
+            // Animation de scroll vers les résultats
+            setTimeout(() => {
+                document.getElementById('resultsSection').scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }, 300);
+        }
+
+        async function searchVideos(query, loadMore = false) {
+            try {
+                if (!loadMore) {
+                    showLoading('videosResults', 'Recherche de vidéos...');
+                }
+                
+                let order = 'relevance';
+                if (currentFilter === 'date') order = 'date';
+                if (currentFilter === 'viewCount') order = 'viewCount';
+                
+                let url = `${API_BASE}/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&order=${order}&key=${API_KEY}`;
+                
+                if (loadMore && nextPageTokens.videos) {
+                    url += `&pageToken=${nextPageTokens.videos}`;
+                }
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                nextPageTokens.videos = data.nextPageToken || null;
+                
+                if (data.items?.length) {
+                    const videoIds = data.items.map(item => item.id.videoId).join(',');
+                    const detailsResponse = await fetch(
+                        `${API_BASE}/videos?part=snippet,statistics,contentDetails&id=${videoIds}&key=${API_KEY}`
+                    );
+                    const detailsData = await detailsResponse.json();
+                    
+                    // Filtrer les shorts (< 1 minute)
+                    const filteredVideos = detailsData.items.filter(video => {
+                        const duration = video.contentDetails?.duration || '';
+                        return !isShortVideo(duration);
+                    });
+                    
+                    if (loadMore) {
+                        appendVideos(filteredVideos, 'videosResults');
+                    } else {
+                        displayVideos(filteredVideos, 'videosResults');
+                    }
+                    
+                    // Afficher le bouton "Afficher plus" si il y a plus de résultats
+                    if (nextPageTokens.videos) {
+                        loadMoreBtn.style.display = 'flex';
+                    } else {
+                        loadMoreBtn.style.display = 'none';
+                    }
+                } else {
+                    if (!loadMore) {
+                        showMessage('videosResults', 'Aucune vidéo trouvée');
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur recherche vidéos:', error);
+                if (!loadMore) {
+                    showMessage('videosResults', 'Erreur de recherche');
+                }
+            }
+        }
+
+        async function searchChannels(query, loadMore = false) {
+            try {
+                if (!loadMore) {
+                    showLoading('channelsResults', 'Recherche de chaînes...');
+                }
+                
+                let url = `${API_BASE}/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=channel&key=${API_KEY}`;
+                
+                if (loadMore && nextPageTokens.channels) {
+                    url += `&pageToken=${nextPageTokens.channels}`;
+                }
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                nextPageTokens.channels = data.nextPageToken || null;
+                
+                if (data.items?.length) {
+                    const channelIds = data.items.map(item => item.snippet.channelId).join(',');
+                    const detailsResponse = await fetch(
+                        `${API_BASE}/channels?part=snippet,statistics&id=${channelIds}&key=${API_KEY}`
+                    );
+                    const detailsData = await detailsResponse.json();
+                    
+                    // Trier par popularité
+                    detailsData.items.sort((a, b) => {
+                        const subsA = parseInt(a.statistics?.subscriberCount || 0);
+                        const subsB = parseInt(b.statistics?.subscriberCount || 0);
+                        return subsB - subsA;
+                    });
+                    
+                    if (loadMore) {
+                        appendChannels(detailsData.items);
+                    } else {
+                        displayChannels(detailsData.items);
+                    }
+                } else {
+                    if (!loadMore) {
+                        showMessage('channelsResults', 'Aucune chaîne trouvée');
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur recherche chaînes:', error);
+                if (!loadMore) {
+                    showMessage('channelsResults', 'Erreur de recherche');
+                }
+            }
+        }
+
+        async function loadChannelDetail(channelId) {
+            try {
+                showLoading('channelDetailSection', 'Chargement de la chaîne...');
+                
+                // Cacher les autres sections
+                document.getElementById('videosResults').style.display = 'none';
+                document.getElementById('channelsResults').style.display = 'none';
+                document.getElementById('videoFilters').style.display = 'none';
+                
+                // Afficher la section détaillée
+                document.getElementById('channelDetailSection').style.display = 'block';
+                
+                const [channelResponse, videosResponse] = await Promise.all([
+                    fetch(`${API_BASE}/channels?part=snippet,statistics,brandingSettings&id=${channelId}&key=${API_KEY}`),
+                    fetch(`${API_BASE}/search?part=snippet&maxResults=12&channelId=${channelId}&type=video&order=date&key=${API_KEY}`)
+                ]);
+                
+                const channelData = await channelResponse.json();
+                const videosData = await videosResponse.json();
+                
+                currentChannelData = {
+                    channel: channelData.items[0],
+                    videos: videosData.items,
+                    nextPageToken: videosData.nextPageToken
+                };
+                
+                displayChannelDetail();
+                
+                // Animation de scroll
+                setTimeout(() => {
+                    document.getElementById('channelDetailSection').scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }, 300);
+                
+            } catch (error) {
+                console.error('Erreur chargement chaîne:', error);
+                showMessage('channelDetailSection', 'Erreur de chargement');
+            }
+        }
+
+        async function loadChannelVideos(filter = 'date', loadMore = false) {
+            try {
+                if (!currentChannelData) return;
+                
+                if (!loadMore) {
+                    showLoading('channelVideosList', 'Chargement des vidéos...');
+                }
+                
+                let order = filter;
+                let url = `${API_BASE}/search?part=snippet&maxResults=12&channelId=${currentChannelData.channel.id}&type=video&order=${order}&key=${API_KEY}`;
+                
+                if (loadMore && currentChannelData.nextPageToken) {
+                    url += `&pageToken=${currentChannelData.nextPageToken}`;
+                }
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                currentChannelData.nextPageToken = data.nextPageToken || null;
+                
+                if (data.items?.length) {
+                    const videoIds = data.items.map(item => item.id.videoId).join(',');
+                    const detailsResponse = await fetch(
+                        `${API_BASE}/videos?part=snippet,statistics,contentDetails&id=${videoIds}&key=${API_KEY}`
+                    );
+                    const detailsData = await detailsResponse.json();
+                    
+                    // FILTRER LES SHORTS (< 1 minute)
+                    const filteredVideos = detailsData.items.filter(video => {
+                        const duration = video.contentDetails?.duration || '';
+                        return !isShortVideo(duration);
+                    });
+                    
+                    if (loadMore) {
+                        appendVideos(filteredVideos, 'channelVideosList');
+                    } else {
+                        displayVideos(filteredVideos, 'channelVideosList');
+                    }
+                } else {
+                    showMessage('channelVideosList', 'Aucune vidéo sur cette chaîne');
+                }
+            } catch (error) {
+                console.error('Erreur chargement vidéos chaîne:', error);
+                showMessage('channelVideosList', 'Erreur de chargement');
+            }
+        }
+
+        function displayChannelDetail() {
+            const channel = currentChannelData.channel;
+            const container = document.getElementById('channelDetailSection');
+            
+            const subscribers = channel.statistics?.subscriberCount ? 
+                formatNumber(channel.statistics.subscriberCount) : 'N/A';
+            const videoCount = channel.statistics?.videoCount ? 
+                formatNumber(channel.statistics.videoCount) : '0';
+            const viewCount = channel.statistics?.viewCount ? 
+                formatNumber(channel.statistics.viewCount) : '0';
+            
+            container.innerHTML = `
+                <div class="channel-detail-section">
+                    <div class="channel-header">
+                        <div class="channel-avatar-large">
+                            <img src="${channel.snippet.thumbnails.high?.url || channel.snippet.thumbnails.medium.url}" 
+                                 alt="${channel.snippet.title}">
+                        </div>
+                        <div class="channel-info">
+                            <div class="channel-name-large">${channel.snippet.title}</div>
+                            <div class="channel-stats-large">
+                                <div class="stat-item-large">
+                                    <i class="fas fa-users"></i>
+                                    <div class="stat-text">
+                                        <div class="stat-number">${subscribers}</div>
+                                        <div class="stat-label">Abonnés</div>
+                                    </div>
+                                </div>
+                                <div class="stat-item-large">
+                                    <i class="fas fa-video"></i>
+                                    <div class="stat-text">
+                                        <div class="stat-number">${videoCount}</div>
+                                        <div class="stat-label">Vidéos</div>
+                                    </div>
+                                </div>
+                                <div class="stat-item-large">
+                                    <i class="fas fa-eye"></i>
+                                    <div class="stat-text">
+                                        <div class="stat-number">${viewCount}</div>
+                                        <div class="stat-label">Vues totales</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="color: var(--text-light); line-height: 1.6;">
+                                ${channel.snippet.description || 'Aucune description disponible'}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="channel-tabs">
+                        <button class="channel-tab active" data-tab="videos" onclick="switchChannelTab('videos')">
+                            <i class="fas fa-video"></i>
+                            Vidéos
+                        </button>
+                        <button class="channel-tab" data-tab="about" onclick="switchChannelTab('about')">
+                            <i class="fas fa-info-circle"></i>
+                            À propos
+                        </button>
+                    </div>
+                    
+                    <div id="channelVideosTab" style="display: block;">
+                        <div style="margin-bottom: 30px;">
+                            <div class="filter-buttons">
+                                <button class="filter-btn active" onclick="loadChannelVideos('date')">Le plus récent</button>
+                                <button class="filter-btn" onclick="loadChannelVideos('viewCount')">Le plus populaire</button>
+                                <button class="filter-btn" onclick="loadChannelVideos('date', true)">Le plus vieux</button>
+                            </div>
+                        </div>
+                        <div id="channelVideosList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px;"></div>
+                    </div>
+                    
+                    <div id="channelAboutTab" style="display: none; padding: 30px; background: rgba(57, 100, 254, 0.03); border-radius: 15px;">
+                        <h3 style="font-size: 20px; margin-bottom: 20px; color: var(--text);">À propos de la chaîne</h3>
+                        <div style="color: var(--text-light); line-height: 1.8;">
+                            ${channel.snippet.description || 'Aucune description disponible'}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Charger les vidéos initiales
+            loadChannelVideos('date');
+        }
+
+        // Fonctions globales pour les onglets de chaîne
+        window.switchChannelTab = function(tab) {
+            document.querySelectorAll('.channel-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('channelVideosTab').style.display = 'none';
+            document.getElementById('channelAboutTab').style.display = 'none';
+            
+            if (tab === 'videos') {
+                document.getElementById('channelVideosTab').style.display = 'block';
+            } else {
+                document.getElementById('channelAboutTab').style.display = 'block';
+            }
+        };
+
+        function displayVideos(videos, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            container.innerHTML = '';
+            appendVideos(videos, containerId);
+        }
+
+        function appendVideos(videos, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            videos.forEach((video, index) => {
+                const duration = video.contentDetails?.duration ? 
+                    formatDuration(video.contentDetails.duration) : '--:--';
+                const views = video.statistics?.viewCount ? 
+                    formatNumber(video.statistics.viewCount) : 'N/A';
+                const date = video.snippet?.publishedAt ? 
+                    formatDate(video.snippet.publishedAt) : '';
+                
+                const card = document.createElement('div');
+                card.className = 'video-card';
+                card.style.animationDelay = `${index * 0.05}s`;
+                card.innerHTML = `
+                    <div class="thumbnail-container">
+                        <img src="${video.snippet.thumbnails.medium.url}" 
+                             alt="${video.snippet.title}" 
+                             class="video-thumbnail">
+                        <div class="play-overlay">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="duration-badge">${duration}</div>
+                    </div>
+                    <div class="video-content">
+                        <div class="video-title">${video.snippet.title}</div>
+                        <div class="video-meta">
+                            <span><i class="fas fa-eye"></i> ${views}</span>
+                            <span><i class="far fa-calendar"></i> ${date}</span>
+                        </div>
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => playVideo(video.id));
+                container.appendChild(card);
+            });
+        }
+
+        function displayChannels(channels) {
+            channelsResults.innerHTML = '';
+            appendChannels(channels);
+        }
+
+        function appendChannels(channels) {
+            channels.forEach((channel, index) => {
+                const subscribers = channel.statistics?.subscriberCount ? 
+                    formatNumber(channel.statistics.subscriberCount) : 'N/A';
+                const videoCount = channel.statistics?.videoCount ? 
+                    formatNumber(channel.statistics.videoCount) : '0';
+                
+                const card = document.createElement('div');
+                card.className = 'channel-card';
+                card.style.animationDelay = `${index * 0.05}s`;
+                card.innerHTML = `
+                    <div class="channel-avatar">
+                        <img src="${channel.snippet.thumbnails.medium.url}" 
+                             alt="${channel.snippet.title}">
+                    </div>
+                    <div class="channel-name">${channel.snippet.title}</div>
+                    <div class="channel-description">
+                        ${channel.snippet.description || 'Chaîne YouTube populaire'}
+                    </div>
+                    <div class="channel-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-users"></i>
+                            ${subscribers}
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-video"></i>
+                            ${videoCount}
+                        </div>
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => loadChannelDetail(channel.id));
+                channelsResults.appendChild(card);
+            });
+        }
+
+        function playFromUrl() {
+            const url = videoUrlInput.value.trim();
+            if (!url) {
+                showNotification('Veuillez entrer une URL YouTube', 'warning');
+                return;
+            }
+
+            const videoId = extractVideoId(url);
+            if (videoId) {
+                playVideo(videoId);
+            } else {
+                showNotification('URL YouTube invalide', 'error');
+            }
+        }
+
+        function extractVideoId(url) {
+            try {
+                const urlObj = new URL(url.startsWith('http') ? url : 'https://' + url);
+                
+                if (urlObj.hostname.includes('youtu.be')) {
+                    return urlObj.pathname.split('/')[1];
+                }
+                
+                if (urlObj.hostname.includes('youtube.com')) {
+                    if (urlObj.pathname.startsWith('/shorts/')) {
+                        return urlObj.pathname.split('/')[2];
+                    }
+                    return urlObj.searchParams.get('v');
+                }
+            } catch {
+                return null;
+            }
+            return null;
+        }
+
+        function playVideo(videoId) {
+            const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&fs=1&modestbranding=1`;
+            currentVideoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+            
+            videoPlayer.src = embedUrl;
+            videoUrlInput.value = currentVideoUrl;
+            
+            showNotification('Lecture de la vidéo', 'success');
+            
+            document.querySelector('.player-section').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+
+        // CORRECTION : Fonction pour copier et ouvrir NoTube - FONCTIONNEL
+        async function copyAndOpenNoTube() {
+            if (!currentVideoUrl) {
+                showNotification('Aucune vidéo en cours de lecture', 'warning');
+                return;
+            }
+
+            try {
+                // Utiliser l'API Clipboard moderne
+                await navigator.clipboard.writeText(currentVideoUrl);
+                
+                // Ouvrir NoTube dans un nouvel onglet
+                const noTubeUrl = `https://notube.lol/fr/youtube-app-299?video=${encodeURIComponent(currentVideoUrl)}`;
+                window.open(noTubeUrl, '_blank', 'noopener,noreferrer');
+                
+                // Afficher la notification de confirmation
+                showNotification('✅ Lien copié et NoTube ouvert !', 'success');
+                
+            } catch (err) {
+                console.error('Erreur lors de la copie :', err);
+                
+                // Fallback pour les anciens navigateurs
+                try {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = currentVideoUrl;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    const noTubeUrl = `https://notube.lol/fr/youtube-app-299?video=${encodeURIComponent(currentVideoUrl)}`;
+                    window.open(noTubeUrl, '_blank', 'noopener,noreferrer');
+                    
+                    showNotification('✅ Lien copié et NoTube ouvert !', 'success');
+                } catch (fallbackErr) {
+                    console.error('Erreur fallback :', fallbackErr);
+                    showNotification('❌ Impossible de copier le lien', 'error');
+                }
+            }
+        }
+
+        async function loadMoreContent() {
+            if (currentSearchType === 'video') {
+                await searchVideos(currentSearchQuery, true);
+            } else if (currentSearchType === 'channel') {
+                await searchChannels(currentSearchQuery, true);
+            }
+            
+            // Animation du bouton
+            loadMoreBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                loadMoreBtn.style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        function showNotification(message, type) {
+            const colors = {
+                success: 'linear-gradient(135deg, var(--secondary), #2950ff)',
+                error: 'linear-gradient(135deg, #ff4757, #ff6b6b)',
+                warning: 'linear-gradient(135deg, #ffa502, #ffbe76)'
+            };
+            
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.style.background = colors[type] || colors.success;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                <div>${message}</div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function formatDuration(duration) {
+            const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+            const hours = (match[1] || '').replace('H', '');
+            const minutes = (match[2] || '').replace('M', '');
+            const seconds = (match[3] || '').replace('S', '');
+            
+            if (hours) {
+                return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
+            }
+            return `${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
+        }
+
+        function formatNumber(num) {
+            const n = parseInt(num);
+            if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+            if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+            return n;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            
+            if (days === 0) return "Aujourd'hui";
+            if (days === 1) return 'Hier';
+            if (days < 7) return `${days}j`;
+            if (days < 30) return `${Math.floor(days / 7)}sem`;
+            if (days < 365) return `${Math.floor(days / 30)}mois`;
+            return `${Math.floor(days / 365)}an`;
+        }
+
+        function showLoading(containerId, message) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            container.innerHTML = `
+                <div class="message loading">
+                    <div class="loader"></div>
+                    <div>${message}</div>
+                </div>
+            `;
+        }
+
+        function showMessage(containerId, message) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            container.innerHTML = `
+                <div class="message">
+                    <i class="fas fa-info-circle" style="font-size: 24px; margin-bottom: 15px; color: var(--secondary);"></i>
+                    <div>${message}</div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
