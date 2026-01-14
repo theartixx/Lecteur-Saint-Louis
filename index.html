@@ -1056,6 +1056,8 @@
             justify-content: center;
             gap: 15px;
             box-shadow: 0 10px 25px rgba(57, 100, 254, 0.25);
+            grid-column: 1 / -1;
+            max-width: 300px;
         }
 
         .channel-load-more-btn:hover {
@@ -1063,37 +1065,36 @@
             box-shadow: 0 15px 35px rgba(57, 100, 254, 0.4);
         }
 
-        /* Bouton "Afficher plus" flottant */
-        .load-more-btn {
-            position: fixed;
-            bottom: 40px;
-            right: 40px;
+        /* Bouton "Afficher plus" pour les résultats de recherche */
+        .results-load-more-btn {
+            margin: 50px auto 0;
+            padding: 20px 50px;
             background: linear-gradient(135deg, var(--secondary), #2950ff);
             color: white;
-            padding: 20px 35px;
             border: none;
             border-radius: 15px;
             font-size: 18px;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 15px 35px rgba(57, 100, 254, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 15px;
-            z-index: 1000;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            animation: floatBtn 3s infinite ease-in-out;
-            display: none;
+            box-shadow: 0 10px 30px rgba(57, 100, 254, 0.3);
+            grid-column: 1 / -1;
+            max-width: 350px;
+            animation: fadeIn 0.5s ease-out;
         }
 
-        @keyframes floatBtn {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .load-more-btn:hover {
+        .results-load-more-btn:hover {
             transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 20px 40px rgba(57, 100, 254, 0.5);
+            box-shadow: 0 15px 40px rgba(57, 100, 254, 0.5);
+        }
+
+        /* Bouton "Afficher plus" flottant (ancien) - À SUPPRIMER */
+        .load-more-btn {
+            display: none !important;
         }
 
         /* Footer */
@@ -1203,13 +1204,6 @@
                 width: 100%;
                 text-align: center;
             }
-            
-            .load-more-btn {
-                bottom: 20px;
-                right: 20px;
-                padding: 15px 25px;
-                font-size: 16px;
-            }
         }
 
         @media (max-width: 480px) {
@@ -1263,13 +1257,6 @@
                 flex: 1;
                 min-width: 120px;
                 text-align: center;
-            }
-            
-            .load-more-btn {
-                bottom: 15px;
-                right: 15px;
-                padding: 12px 20px;
-                font-size: 15px;
             }
         }
     </style>
@@ -1336,6 +1323,12 @@
             
             <!-- Résultats chaînes -->
             <div id="channelsResults" style="display: none;"></div>
+            
+            <!-- Bouton "Afficher plus" pour les résultats -->
+            <button class="results-load-more-btn" id="resultsLoadMoreBtn" style="display: none;">
+                <i class="fas fa-plus"></i>
+                Afficher plus de résultats
+            </button>
         </section>
 
         <!-- Section lecteur -->
@@ -1365,7 +1358,7 @@
             </div>
         </section>
 
-        <!-- Section tendances (EN BAS APRÈS LE LECTEUR) -->
+        <!-- Section tendances -->
         <section class="trending-section" id="trendingSection">
             <h2 class="section-title">
                 <i class="fas fa-fire"></i>
@@ -1374,12 +1367,6 @@
             <div id="trendingVideos"></div>
         </section>
     </div>
-
-    <!-- Bouton "Afficher plus" flottant -->
-    <button class="load-more-btn" id="loadMoreBtn">
-        <i class="fas fa-plus"></i>
-        Afficher plus
-    </button>
 
     <footer>
         <div style="font-size: 22px; font-weight: 900; margin-bottom: 20px; color: var(--secondary);">
@@ -1404,32 +1391,12 @@
         let currentSearchType = 'video';
         let nextPageTokens = {
             videos: null,
-            channels: null,
-            channelVideos: null
+            channels: null
         };
         let isSearching = false;
         let currentChannelVideosPageToken = null;
         let currentChannelId = null;
         let currentChannelFilter = 'date';
-
-        // Initialisation
-        document.addEventListener('DOMContentLoaded', () => {
-            initParticles();
-            loadTrendingVideos();
-            setupEventListeners();
-            playVideo('dQw4w9WgXcQ');
-            searchInput.focus();
-            
-            // Observer pour le bouton "Afficher plus"
-            setupIntersectionObserver();
-            
-            // Animation d'entrée globale
-            document.body.style.opacity = '0';
-            setTimeout(() => {
-                document.body.style.transition = 'opacity 0.8s ease';
-                document.body.style.opacity = '1';
-            }, 100);
-        });
 
         // Références aux éléments DOM
         const searchInput = document.getElementById('searchInput');
@@ -1439,7 +1406,24 @@
         const copyLinkBtn = document.getElementById('copyLinkBtn');
         const videoPlayer = document.getElementById('videoPlayer');
         const channelsResults = document.getElementById('channelsResults');
-        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        const resultsLoadMoreBtn = document.getElementById('resultsLoadMoreBtn');
+        const videosResults = document.getElementById('videosResults');
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            initParticles();
+            loadTrendingVideos();
+            setupEventListeners();
+            playVideo('dQw4w9WgXcQ');
+            searchInput.focus();
+            
+            // Animation d'entrée globale
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.8s ease';
+                document.body.style.opacity = '1';
+            }, 100);
+        });
 
         function initParticles() {
             const container = document.getElementById('particles');
@@ -1500,28 +1484,8 @@
                 });
             });
 
-            // Bouton "Afficher plus"
-            loadMoreBtn.addEventListener('click', loadMoreContent);
-        }
-
-        function setupIntersectionObserver() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting && 
-                        !isSearching && 
-                        (nextPageTokens.videos || nextPageTokens.channels)) {
-                        loadMoreBtn.style.display = 'flex';
-                    }
-                });
-            }, {
-                threshold: 0.5
-            });
-
-            // Observer la section des résultats
-            const resultsSection = document.getElementById('resultsSection');
-            if (resultsSection) {
-                observer.observe(resultsSection);
-            }
+            // Bouton "Afficher plus" pour les résultats
+            resultsLoadMoreBtn.addEventListener('click', loadMoreResults);
         }
 
         function animateTabSwitch(btn) {
@@ -1553,11 +1517,25 @@
                 channelsDiv.style.display = 'none';
                 filters.style.display = 'flex';
                 currentSearchType = 'video';
+                
+                // Afficher ou cacher le bouton "Afficher plus" selon le type
+                if (nextPageTokens.videos) {
+                    resultsLoadMoreBtn.style.display = 'flex';
+                } else {
+                    resultsLoadMoreBtn.style.display = 'none';
+                }
             } else {
                 videosDiv.style.display = 'none';
                 channelsDiv.style.display = 'grid';
                 filters.style.display = 'none';
                 currentSearchType = 'channel';
+                
+                // Afficher ou cacher le bouton "Afficher plus" selon le type
+                if (nextPageTokens.channels) {
+                    resultsLoadMoreBtn.style.display = 'flex';
+                } else {
+                    resultsLoadMoreBtn.style.display = 'none';
+                }
             }
         }
 
@@ -1572,7 +1550,6 @@
                 const data = await response.json();
                 
                 if (data.items?.length) {
-                    // Filtrer les shorts (< 1 minute)
                     const filteredVideos = data.items.filter(video => {
                         const duration = video.contentDetails?.duration || '';
                         return !isShortVideo(duration);
@@ -1609,7 +1586,7 @@
 
             isSearching = true;
             currentSearchQuery = query;
-            nextPageTokens = { videos: null, channels: null, channelVideos: null };
+            nextPageTokens = { videos: null, channels: null };
             currentChannelData = null;
             
             // Afficher la section résultats
@@ -1628,6 +1605,9 @@
             
             // Activer l'onglet vidéos par défaut
             document.querySelector('[data-tab="videos"]').click();
+            
+            // Gérer l'affichage du bouton "Afficher plus"
+            updateLoadMoreButton();
             
             // Scroll vers les résultats
             setTimeout(() => {
@@ -1666,7 +1646,6 @@
                     );
                     const detailsData = await detailsResponse.json();
                     
-                    // Filtrer les shorts
                     const filteredVideos = detailsData.items.filter(video => {
                         const duration = video.contentDetails?.duration || '';
                         return !isShortVideo(duration);
@@ -1678,12 +1657,8 @@
                         displayVideos(filteredVideos, 'videosResults');
                     }
                     
-                    // Afficher le bouton "Afficher plus" si il y a plus de résultats
-                    if (nextPageTokens.videos) {
-                        loadMoreBtn.style.display = 'flex';
-                    } else {
-                        loadMoreBtn.style.display = 'none';
-                    }
+                    // Mettre à jour le bouton "Afficher plus"
+                    updateLoadMoreButton();
                 } else {
                     if (!loadMore) {
                         showMessage('videosResults', 'Aucune vidéo trouvée');
@@ -1721,7 +1696,6 @@
                     );
                     const detailsData = await detailsResponse.json();
                     
-                    // Trier par popularité
                     detailsData.items.sort((a, b) => {
                         const subsA = parseInt(a.statistics?.subscriberCount || 0);
                         const subsB = parseInt(b.statistics?.subscriberCount || 0);
@@ -1733,6 +1707,9 @@
                     } else {
                         displayChannels(detailsData.items);
                     }
+                    
+                    // Mettre à jour le bouton "Afficher plus"
+                    updateLoadMoreButton();
                 } else {
                     if (!loadMore) {
                         showMessage('channelsResults', 'Aucune chaîne trouvée');
@@ -1743,6 +1720,48 @@
                 if (!loadMore) {
                     showMessage('channelsResults', 'Erreur de recherche');
                 }
+            }
+        }
+
+        function updateLoadMoreButton() {
+            if (currentSearchType === 'video' && nextPageTokens.videos) {
+                resultsLoadMoreBtn.style.display = 'flex';
+            } else if (currentSearchType === 'channel' && nextPageTokens.channels) {
+                resultsLoadMoreBtn.style.display = 'flex';
+            } else {
+                resultsLoadMoreBtn.style.display = 'none';
+            }
+        }
+
+        async function loadMoreResults() {
+            try {
+                // Animation du bouton
+                resultsLoadMoreBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Chargement...';
+                resultsLoadMoreBtn.disabled = true;
+                
+                if (currentSearchType === 'video') {
+                    await searchVideos(currentSearchQuery, true);
+                } else if (currentSearchType === 'channel') {
+                    await searchChannels(currentSearchQuery, true);
+                }
+                
+                // Remettre le bouton à son état normal
+                resultsLoadMoreBtn.innerHTML = '<i class="fas fa-plus"></i> Afficher plus de résultats';
+                resultsLoadMoreBtn.disabled = false;
+                
+                // Animation
+                resultsLoadMoreBtn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    resultsLoadMoreBtn.style.transform = 'scale(1)';
+                }, 200);
+                
+            } catch (error) {
+                console.error('Erreur chargement supplémentaire:', error);
+                showNotification('Erreur lors du chargement', 'error');
+                
+                // Remettre le bouton à son état normal en cas d'erreur
+                resultsLoadMoreBtn.innerHTML = '<i class="fas fa-plus"></i> Afficher plus de résultats';
+                resultsLoadMoreBtn.disabled = false;
             }
         }
 
@@ -1803,7 +1822,6 @@
                 const channelVideosList = document.getElementById('channelVideosList');
                 if (!channelVideosList) return;
                 
-                // Montrer le chargement si c'est la première page
                 if (!currentChannelVideosPageToken) {
                     showLoading('channelVideosList', 'Chargement des vidéos...');
                 }
@@ -1826,30 +1844,24 @@
                     );
                     const detailsData = await detailsResponse.json();
                     
-                    // Filtrer les shorts
                     const filteredVideos = detailsData.items.filter(video => {
                         const duration = video.contentDetails?.duration || '';
                         return !isShortVideo(duration);
                     });
                     
                     if (currentChannelVideosPageToken) {
-                        // Ajouter un bouton "Afficher plus"
                         const loadMoreBtn = document.createElement('button');
                         loadMoreBtn.className = 'channel-load-more-btn';
                         loadMoreBtn.innerHTML = '<i class="fas fa-plus"></i> Afficher plus de vidéos';
                         loadMoreBtn.onclick = loadMoreChannelVideos;
                         
-                        // Si un bouton existe déjà, le supprimer
                         const existingBtn = channelVideosList.querySelector('.channel-load-more-btn');
                         if (existingBtn) existingBtn.remove();
                         
-                        // Ajouter les vidéos
                         appendVideos(filteredVideos, 'channelVideosList');
                         
-                        // Ajouter le bouton "Afficher plus"
                         channelVideosList.appendChild(loadMoreBtn);
                     } else {
-                        // Dernière page, pas de bouton "Afficher plus"
                         displayVideos(filteredVideos, 'channelVideosList');
                     }
                 } else {
@@ -1964,13 +1976,11 @@
             currentChannelFilter = filter;
             currentChannelVideosPageToken = null;
             
-            // Mettre à jour les boutons actifs
             document.querySelectorAll('#channelVideosTab .filter-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             event.target.classList.add('active');
             
-            // Recharger les vidéos
             await loadMoreChannelVideos();
         };
 
@@ -2148,20 +2158,6 @@
                     showNotification('❌ Impossible de copier le lien', 'error');
                 }
             }
-        }
-
-        async function loadMoreContent() {
-            if (currentSearchType === 'video') {
-                await searchVideos(currentSearchQuery, true);
-            } else if (currentSearchType === 'channel') {
-                await searchChannels(currentSearchQuery, true);
-            }
-            
-            // Animation du bouton
-            loadMoreBtn.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                loadMoreBtn.style.transform = 'scale(1)';
-            }, 200);
         }
 
         function showNotification(message, type) {
