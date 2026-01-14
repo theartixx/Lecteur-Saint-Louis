@@ -340,6 +340,7 @@
             border: 1px solid var(--border);
             margin-bottom: 40px;
             animation: slideInLeft 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s both;
+            transition: all 0.5s ease;
         }
 
         @keyframes slideInLeft {
@@ -499,7 +500,7 @@
             box-shadow: 0 10px 25px rgba(57, 100, 254, 0.3);
         }
 
-        /* Section résultats - MAINTENANT DIRECTEMENT SOUS LA BARRE DE RECHERCHE */
+        /* Section résultats */
         .results-section {
             background: var(--card-bg);
             border-radius: var(--radius);
@@ -507,7 +508,7 @@
             box-shadow: var(--shadow);
             border: 1px solid var(--border);
             animation: fadeIn 0.8s ease-out;
-            display: none; /* Caché par défaut */
+            display: none;
             margin-bottom: 40px;
         }
 
@@ -740,7 +741,7 @@
             border: 1px solid var(--border);
             margin-bottom: 40px;
             animation: slideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-            display: none; /* Caché par défaut */
+            display: none;
         }
 
         @keyframes slideUp {
@@ -1027,10 +1028,39 @@
             animation: spin 1.5s linear infinite, colorChange 3s infinite alternate;
         }
 
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         @keyframes colorChange {
             0% { border-top-color: var(--secondary); }
             50% { border-top-color: var(--accent); }
             100% { border-top-color: var(--secondary); }
+        }
+
+        /* Bouton "Afficher plus" pour les chaînes */
+        .channel-load-more-btn {
+            margin: 40px auto 0;
+            padding: 18px 45px;
+            background: linear-gradient(135deg, var(--secondary), #2950ff);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            box-shadow: 0 10px 25px rgba(57, 100, 254, 0.25);
+        }
+
+        .channel-load-more-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(57, 100, 254, 0.4);
         }
 
         /* Bouton "Afficher plus" flottant */
@@ -1053,7 +1083,7 @@
             z-index: 1000;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             animation: floatBtn 3s infinite ease-in-out;
-            display: none; /* Caché par défaut */
+            display: none;
         }
 
         @keyframes floatBtn {
@@ -1276,7 +1306,7 @@
             </div>
         </section>
 
-        <!-- Section résultats (APPEARAIT DIRECTEMENT SOUS LA BARRE DE RECHERCHE) -->
+        <!-- Section résultats -->
         <section class="results-section" id="resultsSection">
             <h2 class="section-title">
                 <i class="fas fa-search"></i>
@@ -1301,25 +1331,11 @@
                 <button class="filter-btn" data-filter="viewCount">Le plus populaire</button>
             </div>
 
-            <!-- Section chaîne détaillée (cachée par défaut) -->
-            <div id="channelDetailSection" class="channel-detail-section">
-                <!-- Rempli dynamiquement -->
-            </div>
-
             <!-- Résultats vidéos -->
             <div id="videosResults"></div>
             
             <!-- Résultats chaînes -->
             <div id="channelsResults" style="display: none;"></div>
-        </section>
-
-        <!-- Section tendances (CACHÉE QUAND ON RECHERCHE) -->
-        <section class="trending-section" id="trendingSection">
-            <h2 class="section-title">
-                <i class="fas fa-fire"></i>
-                Tendances du moment
-            </h2>
-            <div id="trendingVideos"></div>
         </section>
 
         <!-- Section lecteur -->
@@ -1347,6 +1363,15 @@
                     </button>
                 </div>
             </div>
+        </section>
+
+        <!-- Section tendances (EN BAS APRÈS LE LECTEUR) -->
+        <section class="trending-section" id="trendingSection">
+            <h2 class="section-title">
+                <i class="fas fa-fire"></i>
+                Tendances du moment
+            </h2>
+            <div id="trendingVideos"></div>
         </section>
     </div>
 
@@ -1383,6 +1408,9 @@
             channelVideos: null
         };
         let isSearching = false;
+        let currentChannelVideosPageToken = null;
+        let currentChannelId = null;
+        let currentChannelFilter = 'date';
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', () => {
@@ -1402,6 +1430,16 @@
                 document.body.style.opacity = '1';
             }, 100);
         });
+
+        // Références aux éléments DOM
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const videoUrlInput = document.getElementById('videoUrlInput');
+        const playUrlBtn = document.getElementById('playUrlBtn');
+        const copyLinkBtn = document.getElementById('copyLinkBtn');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const channelsResults = document.getElementById('channelsResults');
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
 
         function initParticles() {
             const container = document.getElementById('particles');
@@ -1430,7 +1468,7 @@
                 if (e.key === 'Enter') playFromUrl();
             });
 
-            // CORRECTION : Copier et ouvrir NoTube - FONCTIONNEL
+            // Copier et ouvrir NoTube
             copyLinkBtn.addEventListener('click', async () => {
                 await copyAndOpenNoTube();
             });
@@ -1508,19 +1546,16 @@
             
             const videosDiv = document.getElementById('videosResults');
             const channelsDiv = document.getElementById('channelsResults');
-            const channelDetail = document.getElementById('channelDetailSection');
             const filters = document.getElementById('videoFilters');
             
             if (btn.dataset.tab === 'videos') {
                 videosDiv.style.display = 'grid';
                 channelsDiv.style.display = 'none';
-                channelDetail.style.display = 'none';
                 filters.style.display = 'flex';
                 currentSearchType = 'video';
             } else {
                 videosDiv.style.display = 'none';
                 channelsDiv.style.display = 'grid';
-                channelDetail.style.display = 'none';
                 filters.style.display = 'none';
                 currentSearchType = 'channel';
             }
@@ -1540,7 +1575,6 @@
                     // Filtrer les shorts (< 1 minute)
                     const filteredVideos = data.items.filter(video => {
                         const duration = video.contentDetails?.duration || '';
-                        // Vérifier si c'est un short (durée < 1 minute)
                         return !isShortVideo(duration);
                     });
                     
@@ -1555,7 +1589,6 @@
         }
 
         function isShortVideo(duration) {
-            // Vérifie si la durée est inférieure à 1 minute (60 secondes)
             const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
             if (!match) return false;
             
@@ -1564,20 +1597,23 @@
             const seconds = parseInt(match[3]) || 0;
             
             const totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
-            return totalSeconds < 60; // Moins d'une minute = short
+            return totalSeconds < 60;
         }
 
         async function performSearch() {
             const query = searchInput.value.trim();
-            if (!query) return;
+            if (!query) {
+                showNotification('Veuillez entrer une recherche', 'warning');
+                return;
+            }
 
             isSearching = true;
             currentSearchQuery = query;
             nextPageTokens = { videos: null, channels: null, channelVideos: null };
+            currentChannelData = null;
             
-            // Afficher la section résultats SOUS la barre de recherche
+            // Afficher la section résultats
             document.getElementById('resultsSection').style.display = 'block';
-            document.getElementById('trendingSection').style.display = 'none';
             
             // Animation de recherche
             searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Recherche...';
@@ -1590,9 +1626,10 @@
             searchBtn.disabled = false;
             isSearching = false;
             
+            // Activer l'onglet vidéos par défaut
             document.querySelector('[data-tab="videos"]').click();
             
-            // Animation de scroll vers les résultats
+            // Scroll vers les résultats
             setTimeout(() => {
                 document.getElementById('resultsSection').scrollIntoView({ 
                     behavior: 'smooth',
@@ -1629,7 +1666,7 @@
                     );
                     const detailsData = await detailsResponse.json();
                     
-                    // Filtrer les shorts (< 1 minute)
+                    // Filtrer les shorts
                     const filteredVideos = detailsData.items.filter(video => {
                         const duration = video.contentDetails?.duration || '';
                         return !isShortVideo(duration);
@@ -1711,35 +1748,43 @@
 
         async function loadChannelDetail(channelId) {
             try {
+                currentChannelId = channelId;
+                currentChannelVideosPageToken = null;
+                currentChannelFilter = 'date';
+                
+                // Créer la section détaillée si elle n'existe pas
+                let channelDetailSection = document.getElementById('channelDetailSection');
+                if (!channelDetailSection) {
+                    channelDetailSection = document.createElement('div');
+                    channelDetailSection.id = 'channelDetailSection';
+                    channelDetailSection.className = 'channel-detail-section';
+                    document.querySelector('.main-container').insertBefore(
+                        channelDetailSection, 
+                        document.querySelector('.player-section')
+                    );
+                }
+                
                 showLoading('channelDetailSection', 'Chargement de la chaîne...');
                 
-                // Cacher les autres sections
-                document.getElementById('videosResults').style.display = 'none';
-                document.getElementById('channelsResults').style.display = 'none';
-                document.getElementById('videoFilters').style.display = 'none';
-                
-                // Afficher la section détaillée
-                document.getElementById('channelDetailSection').style.display = 'block';
-                
-                const [channelResponse, videosResponse] = await Promise.all([
-                    fetch(`${API_BASE}/channels?part=snippet,statistics,brandingSettings&id=${channelId}&key=${API_KEY}`),
-                    fetch(`${API_BASE}/search?part=snippet&maxResults=12&channelId=${channelId}&type=video&order=date&key=${API_KEY}`)
+                const [channelResponse] = await Promise.all([
+                    fetch(`${API_BASE}/channels?part=snippet,statistics,brandingSettings&id=${channelId}&key=${API_KEY}`)
                 ]);
                 
                 const channelData = await channelResponse.json();
-                const videosData = await videosResponse.json();
                 
                 currentChannelData = {
                     channel: channelData.items[0],
-                    videos: videosData.items,
-                    nextPageToken: videosData.nextPageToken
+                    videos: []
                 };
                 
                 displayChannelDetail();
                 
-                // Animation de scroll
+                // Charger les premières vidéos
+                await loadMoreChannelVideos();
+                
+                // Scroll vers la section détaillée
                 setTimeout(() => {
-                    document.getElementById('channelDetailSection').scrollIntoView({ 
+                    channelDetailSection.scrollIntoView({ 
                         behavior: 'smooth',
                         block: 'start'
                     });
@@ -1751,25 +1796,28 @@
             }
         }
 
-        async function loadChannelVideos(filter = 'date', loadMore = false) {
+        async function loadMoreChannelVideos() {
             try {
-                if (!currentChannelData) return;
+                if (!currentChannelId) return;
                 
-                if (!loadMore) {
+                const channelVideosList = document.getElementById('channelVideosList');
+                if (!channelVideosList) return;
+                
+                // Montrer le chargement si c'est la première page
+                if (!currentChannelVideosPageToken) {
                     showLoading('channelVideosList', 'Chargement des vidéos...');
                 }
                 
-                let order = filter;
-                let url = `${API_BASE}/search?part=snippet&maxResults=12&channelId=${currentChannelData.channel.id}&type=video&order=${order}&key=${API_KEY}`;
+                let url = `${API_BASE}/search?part=snippet&maxResults=12&channelId=${currentChannelId}&type=video&order=${currentChannelFilter}&key=${API_KEY}`;
                 
-                if (loadMore && currentChannelData.nextPageToken) {
-                    url += `&pageToken=${currentChannelData.nextPageToken}`;
+                if (currentChannelVideosPageToken) {
+                    url += `&pageToken=${currentChannelVideosPageToken}`;
                 }
                 
                 const response = await fetch(url);
                 const data = await response.json();
                 
-                currentChannelData.nextPageToken = data.nextPageToken || null;
+                currentChannelVideosPageToken = data.nextPageToken || null;
                 
                 if (data.items?.length) {
                     const videoIds = data.items.map(item => item.id.videoId).join(',');
@@ -1778,15 +1826,30 @@
                     );
                     const detailsData = await detailsResponse.json();
                     
-                    // FILTRER LES SHORTS (< 1 minute)
+                    // Filtrer les shorts
                     const filteredVideos = detailsData.items.filter(video => {
                         const duration = video.contentDetails?.duration || '';
                         return !isShortVideo(duration);
                     });
                     
-                    if (loadMore) {
+                    if (currentChannelVideosPageToken) {
+                        // Ajouter un bouton "Afficher plus"
+                        const loadMoreBtn = document.createElement('button');
+                        loadMoreBtn.className = 'channel-load-more-btn';
+                        loadMoreBtn.innerHTML = '<i class="fas fa-plus"></i> Afficher plus de vidéos';
+                        loadMoreBtn.onclick = loadMoreChannelVideos;
+                        
+                        // Si un bouton existe déjà, le supprimer
+                        const existingBtn = channelVideosList.querySelector('.channel-load-more-btn');
+                        if (existingBtn) existingBtn.remove();
+                        
+                        // Ajouter les vidéos
                         appendVideos(filteredVideos, 'channelVideosList');
+                        
+                        // Ajouter le bouton "Afficher plus"
+                        channelVideosList.appendChild(loadMoreBtn);
                     } else {
+                        // Dernière page, pas de bouton "Afficher plus"
                         displayVideos(filteredVideos, 'channelVideosList');
                     }
                 } else {
@@ -1810,76 +1873,76 @@
                 formatNumber(channel.statistics.viewCount) : '0';
             
             container.innerHTML = `
-                <div class="channel-detail-section">
-                    <div class="channel-header">
-                        <div class="channel-avatar-large">
-                            <img src="${channel.snippet.thumbnails.high?.url || channel.snippet.thumbnails.medium.url}" 
-                                 alt="${channel.snippet.title}">
-                        </div>
-                        <div class="channel-info">
-                            <div class="channel-name-large">${channel.snippet.title}</div>
-                            <div class="channel-stats-large">
-                                <div class="stat-item-large">
-                                    <i class="fas fa-users"></i>
-                                    <div class="stat-text">
-                                        <div class="stat-number">${subscribers}</div>
-                                        <div class="stat-label">Abonnés</div>
-                                    </div>
-                                </div>
-                                <div class="stat-item-large">
-                                    <i class="fas fa-video"></i>
-                                    <div class="stat-text">
-                                        <div class="stat-number">${videoCount}</div>
-                                        <div class="stat-label">Vidéos</div>
-                                    </div>
-                                </div>
-                                <div class="stat-item-large">
-                                    <i class="fas fa-eye"></i>
-                                    <div class="stat-text">
-                                        <div class="stat-number">${viewCount}</div>
-                                        <div class="stat-label">Vues totales</div>
-                                    </div>
+                <h2 class="section-title">
+                    <i class="fas fa-tv"></i>
+                    ${channel.snippet.title}
+                </h2>
+                
+                <div class="channel-header">
+                    <div class="channel-avatar-large">
+                        <img src="${channel.snippet.thumbnails.high?.url || channel.snippet.thumbnails.medium.url}" 
+                             alt="${channel.snippet.title}">
+                    </div>
+                    <div class="channel-info">
+                        <div class="channel-stats-large">
+                            <div class="stat-item-large">
+                                <i class="fas fa-users"></i>
+                                <div class="stat-text">
+                                    <div class="stat-number">${subscribers}</div>
+                                    <div class="stat-label">Abonnés</div>
                                 </div>
                             </div>
-                            <div style="color: var(--text-light); line-height: 1.6;">
-                                ${channel.snippet.description || 'Aucune description disponible'}
+                            <div class="stat-item-large">
+                                <i class="fas fa-video"></i>
+                                <div class="stat-text">
+                                    <div class="stat-number">${videoCount}</div>
+                                    <div class="stat-label">Vidéos</div>
+                                </div>
+                            </div>
+                            <div class="stat-item-large">
+                                <i class="fas fa-eye"></i>
+                                <div class="stat-text">
+                                    <div class="stat-number">${viewCount}</div>
+                                    <div class="stat-label">Vues totales</div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="channel-tabs">
-                        <button class="channel-tab active" data-tab="videos" onclick="switchChannelTab('videos')">
-                            <i class="fas fa-video"></i>
-                            Vidéos
-                        </button>
-                        <button class="channel-tab" data-tab="about" onclick="switchChannelTab('about')">
-                            <i class="fas fa-info-circle"></i>
-                            À propos
-                        </button>
-                    </div>
-                    
-                    <div id="channelVideosTab" style="display: block;">
-                        <div style="margin-bottom: 30px;">
-                            <div class="filter-buttons">
-                                <button class="filter-btn active" onclick="loadChannelVideos('date')">Le plus récent</button>
-                                <button class="filter-btn" onclick="loadChannelVideos('viewCount')">Le plus populaire</button>
-                                <button class="filter-btn" onclick="loadChannelVideos('date', true)">Le plus vieux</button>
-                            </div>
+                </div>
+                
+                <div class="channel-tabs">
+                    <button class="channel-tab active" onclick="switchChannelTab('videos')">
+                        <i class="fas fa-video"></i>
+                        Vidéos
+                    </button>
+                    <button class="channel-tab" onclick="switchChannelTab('about')">
+                        <i class="fas fa-info-circle"></i>
+                        À propos
+                    </button>
+                </div>
+                
+                <div id="channelVideosTab" style="display: block;">
+                    <div style="margin-bottom: 30px;">
+                        <div class="filter-buttons">
+                            <button class="filter-btn ${currentChannelFilter === 'date' ? 'active' : ''}" onclick="changeChannelFilter('date')">Le plus récent</button>
+                            <button class="filter-btn ${currentChannelFilter === 'viewCount' ? 'active' : ''}" onclick="changeChannelFilter('viewCount')">Le plus populaire</button>
+                            <button class="filter-btn ${currentChannelFilter === 'relevance' ? 'active' : ''}" onclick="changeChannelFilter('relevance')">Le plus pertinent</button>
                         </div>
-                        <div id="channelVideosList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px;"></div>
                     </div>
-                    
-                    <div id="channelAboutTab" style="display: none; padding: 30px; background: rgba(57, 100, 254, 0.03); border-radius: 15px;">
-                        <h3 style="font-size: 20px; margin-bottom: 20px; color: var(--text);">À propos de la chaîne</h3>
-                        <div style="color: var(--text-light); line-height: 1.8;">
+                    <div id="channelVideosList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px;"></div>
+                </div>
+                
+                <div id="channelAboutTab" style="display: none;">
+                    <div style="padding: 30px; background: rgba(57, 100, 254, 0.03); border-radius: 15px;">
+                        <h3 style="font-size: 20px; margin-bottom: 20px; color: var(--text);">Description</h3>
+                        <div style="color: var(--text-light); line-height: 1.8; white-space: pre-wrap;">
                             ${channel.snippet.description || 'Aucune description disponible'}
                         </div>
                     </div>
                 </div>
             `;
             
-            // Charger les vidéos initiales
-            loadChannelVideos('date');
+            container.style.display = 'block';
         }
 
         // Fonctions globales pour les onglets de chaîne
@@ -1895,6 +1958,20 @@
             } else {
                 document.getElementById('channelAboutTab').style.display = 'block';
             }
+        };
+
+        window.changeChannelFilter = async function(filter) {
+            currentChannelFilter = filter;
+            currentChannelVideosPageToken = null;
+            
+            // Mettre à jour les boutons actifs
+            document.querySelectorAll('#channelVideosTab .filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Recharger les vidéos
+            await loadMoreChannelVideos();
         };
 
         function displayVideos(videos, containerId) {
@@ -1966,7 +2043,9 @@
                     </div>
                     <div class="channel-name">${channel.snippet.title}</div>
                     <div class="channel-description">
-                        ${channel.snippet.description || 'Chaîne YouTube populaire'}
+                        ${channel.snippet.description ? 
+                            channel.snippet.description.substring(0, 150) + (channel.snippet.description.length > 150 ? '...' : '') 
+                            : 'Chaîne YouTube'}
                     </div>
                     <div class="channel-stats">
                         <div class="stat-item">
@@ -2035,7 +2114,6 @@
             });
         }
 
-        // CORRECTION : Fonction pour copier et ouvrir NoTube - FONCTIONNEL
         async function copyAndOpenNoTube() {
             if (!currentVideoUrl) {
                 showNotification('Aucune vidéo en cours de lecture', 'warning');
@@ -2043,20 +2121,16 @@
             }
 
             try {
-                // Utiliser l'API Clipboard moderne
                 await navigator.clipboard.writeText(currentVideoUrl);
                 
-                // Ouvrir NoTube dans un nouvel onglet
                 const noTubeUrl = `https://notube.lol/fr/youtube-app-299?video=${encodeURIComponent(currentVideoUrl)}`;
                 window.open(noTubeUrl, '_blank', 'noopener,noreferrer');
                 
-                // Afficher la notification de confirmation
                 showNotification('✅ Lien copié et NoTube ouvert !', 'success');
                 
             } catch (err) {
                 console.error('Erreur lors de la copie :', err);
                 
-                // Fallback pour les anciens navigateurs
                 try {
                     const textArea = document.createElement('textarea');
                     textArea.value = currentVideoUrl;
@@ -2128,7 +2202,7 @@
             const n = parseInt(num);
             if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
             if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
-            return n;
+            return n.toString();
         }
 
         function formatDate(dateString) {
